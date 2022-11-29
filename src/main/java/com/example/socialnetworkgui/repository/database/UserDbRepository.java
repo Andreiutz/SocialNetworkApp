@@ -60,8 +60,8 @@ public class UserDbRepository extends AbstractDbRepository<String, User> {
     @Override
     protected String saveEntityQuery(User user) {
         return "INSERT INTO users(user_name, first_name, last_name, " +
-                "email, birth_date, country, county, city, street, street_number) VALUES " +
-                String.format("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s');",
+                "email, birth_date, country, county, city, street, street_number, password) VALUES " +
+                String.format("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s');",
                         user.getId(),
                         user.getFirstName(),
                         user.getLastName(),
@@ -71,7 +71,8 @@ public class UserDbRepository extends AbstractDbRepository<String, User> {
                         user.getAddress().getCounty(),
                         user.getAddress().getCity(),
                         user.getAddress().getStreet(),
-                        user.getAddress().getStreetNumber().toString());
+                        user.getAddress().getStreetNumber().toString(),
+                        user.getPassword());
     }
 
     @Override

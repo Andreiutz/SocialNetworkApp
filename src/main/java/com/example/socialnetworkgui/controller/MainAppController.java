@@ -1,13 +1,13 @@
 package com.example.socialnetworkgui.controller;
 
 import com.example.socialnetworkgui.HelloApplication;
-import com.example.socialnetworkgui.domain.friendship.Friendship;
+import com.example.socialnetworkgui.domain.friendship.FriendRequest;
 import com.example.socialnetworkgui.domain.friendship.Status;
 import com.example.socialnetworkgui.domain.user.User;
 import com.example.socialnetworkgui.domain.validators.ValidationException;
 import com.example.socialnetworkgui.service.Service;
 import com.example.socialnetworkgui.service.ServiceException;
-import com.example.socialnetworkgui.utils.events.FriendShipEntityChangedEvent;
+import com.example.socialnetworkgui.utils.events.EntityChangedEvent;
 import com.example.socialnetworkgui.utils.observer.Observer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,13 +18,14 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
-public class MainAppController implements Observer<FriendShipEntityChangedEvent> {
+public class MainAppController implements Observer<EntityChangedEvent> {
 
     private final ObservableList<User> usersModel = FXCollections.observableArrayList();
     private final ObservableList<Status> statuses = FXCollections.observableArrayList(Status.ACCEPTED, Status.PENDING, Status.REJECTED);
@@ -43,11 +44,16 @@ public class MainAppController implements Observer<FriendShipEntityChangedEvent>
     @FXML
     private Label welcomeLabel;
     @FXML
-    private ComboBox<Status> friendshipsComboBox;
-    @FXML
-    private ListView<Friendship> statusFriendshipsList;
+    private ComboBox<Status> friendRequestsComboBox;
     @FXML
     private TextField searchUserId;
+    @FXML
+    private ListView<FriendRequest> statusFriendRequests;
+    @FXML
+    private Button acceptRequestButton;
+    @FXML
+    private Button rejectRequestButton;
+
 
     @FXML
     public void initialize() {
@@ -67,7 +73,7 @@ public class MainAppController implements Observer<FriendShipEntityChangedEvent>
     }
 
     private void initFriendRequests() {
-        friendshipsComboBox.setItems(statuses);
+        friendRequestsComboBox.setItems(statuses);
     }
 
     private void initModel() {
@@ -77,20 +83,18 @@ public class MainAppController implements Observer<FriendShipEntityChangedEvent>
     }
 
     @FXML
-    public void updateFriendshipList(ActionEvent actionEvent) {
-        Status status = friendshipsComboBox.getSelectionModel().getSelectedItem();
-    }
-
-    @FXML
     public void addFriendRequest(ActionEvent actionEvent) {
         String userName = searchUserId.getText();
+        Alert alert;
         try {
             service.addFriendRequest(userName);
+            alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setContentText("Friend request successfully sent!");
         } catch (ServiceException | ValidationException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
+             alert = new Alert(Alert.AlertType.ERROR);
             alert.setContentText(e.getMessage());
-            alert.show();
         }
+        alert.show();
     }
 
     @FXML
@@ -114,6 +118,13 @@ public class MainAppController implements Observer<FriendShipEntityChangedEvent>
     }
 
     @FXML
+    public void updateFriendshipList(ActionEvent actionEvent) {
+        Status status = friendRequestsComboBox.getSelectionModel().getSelectedItem();
+        List<FriendRequest> friendRequests = StreamSupport.stream(service.getFriendRequest(status).spliterator(), false).toList();
+        statusFriendRequests.getItems().setAll(friendRequests);
+    }
+
+    @FXML
     public void settingsStartUp(ActionEvent actionEvent) throws IOException {
         Stage stage = (Stage)((Node) actionEvent.getSource()).getScene().getWindow();
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("settings-view.fxml"));
@@ -123,10 +134,55 @@ public class MainAppController implements Observer<FriendShipEntityChangedEvent>
         stage.show();
     }
 
-    @Override
-    public void update(FriendShipEntityChangedEvent friendShipEntityChangedEvent) {
-        initFriends();
-        initFriendRequests();
+    @FXML
+    public void updateAcceptAndRejectButtons(MouseEvent mouseEvent) {
+        if (!statusFriendRequests.getSelectionModel().isEmpty()) {
+            FriendRequest currentSelectedFriendRequest = statusFriendRequests.getSelectionModel().getSelectedItem();
+            if (currentSelectedFriendRequest.getStatus().equals(Status.PENDING) &&
+                    !currentSelectedFriendRequest.getFromId().equals(Service.getCurrentLoggedUser().getId())) {
+                acceptRequestButton.setDisable(false);
+                rejectRequestButton.setDisable(false);
+            } else {
+                acceptRequestButton.setDisable(true);
+                rejectRequestButton.setDisable(true);
+            }
+        }
     }
 
+    @FXML
+    public void acceptFriendRequest(ActionEvent actionEvent) {
+        FriendRequest friendRequest = statusFriendRequests.getSelectionModel().getSelectedItem();
+        updateFriendRequest(friendRequest, Status.ACCEPTED);
+    }
+
+    @FXML
+    public void rejectFriendRequest(ActionEvent actionEvent) {
+        FriendRequest friendRequest = statusFriendRequests.getSelectionModel().getSelectedItem();
+        updateFriendRequest(friendRequest, Status.REJECTED);
+    }
+
+    private void updateFriendRequest(FriendRequest friendRequest, Status status) {
+        Alert alert;
+        try {
+            service.updateFriendRequest(friendRequest, status);
+            alert = new Alert(Alert.AlertType.CONFIRMATION);
+            if (status == Status.ACCEPTED) {
+                alert.setContentText("Friend added!");
+            } else {
+                alert.setContentText("Friend request rejected!");
+            }
+        } catch (ServiceException | ValidationException e) {
+            alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText(e.getMessage());
+        }
+        alert.show();
+    }
+
+
+    @Override
+    public void update(EntityChangedEvent entityChangedEvent) {
+        initFriends();
+        initFriendRequests();
+        friendRequestsComboBox.getSelectionModel().clearSelection();
+    }
 }

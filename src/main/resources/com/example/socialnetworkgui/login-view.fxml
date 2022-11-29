@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.PasswordField?>
 <VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.socialnetworkgui.controller.LoginController">
          <children>
             <Label alignment="CENTER" contentDisplay="CENTER" pickOnBounds="true" text="Welcome back!" VBox.vgrow="NEVER">
@@ -17,7 +18,7 @@
             <Label text="User name:" />
             <TextField fx:id="userNameLogInField" maxWidth="200.0" />
             <Label text="Password:" />
-            <TextField fx:id="passwordLogInField" maxWidth="200.0" />
+            <PasswordField fx:id="passwordLogInField" maxWidth="200.0" />
             <Button mnemonicParsing="false" onAction="#logIn" text="Log in" />
             <Button onAction="#signUpStartUp" text="Create account!">
                 <VBox.margin>

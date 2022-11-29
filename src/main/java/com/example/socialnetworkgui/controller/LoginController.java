@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -22,7 +23,7 @@ public class LoginController {
     @FXML
     private TextField userNameLogInField;
     @FXML
-    private TextField passwordLogInField;
+    private PasswordField passwordLogInField;
 
     @FXML
     private void logIn(ActionEvent actionEvent) throws IOException {

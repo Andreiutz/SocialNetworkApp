@@ -1,20 +1,21 @@
 package com.example.socialnetworkgui.utils.events;
 
 
+import com.example.socialnetworkgui.domain.Entity;
 import com.example.socialnetworkgui.domain.friendship.Friendship;
 
-public class FriendShipEntityChangedEvent implements Event {
+public class EntityChangedEvent implements Event {
     private final ChangeEventType type;
-    private final Friendship data;
-    private Friendship oldData;
+    private final Entity data;
+    private Entity oldData;
 
-    public FriendShipEntityChangedEvent(ChangeEventType type, Friendship
+    public EntityChangedEvent(ChangeEventType type, Entity
             data) {
         this.type = type;
         this.data = data;
     }
 
-    public FriendShipEntityChangedEvent(ChangeEventType type, Friendship data, Friendship oldData) {
+    public EntityChangedEvent(ChangeEventType type, Friendship data, Friendship oldData) {
         this.type = type;
         this.data = data;
         this.oldData = oldData;
@@ -24,11 +25,11 @@ public class FriendShipEntityChangedEvent implements Event {
         return type;
     }
 
-    public Friendship getData() {
+    public Entity getData() {
         return data;
     }
 
-    public Friendship getOldData() {
+    public Entity getOldData() {
         return oldData;
     }
 }

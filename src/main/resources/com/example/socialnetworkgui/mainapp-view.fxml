@@ -18,7 +18,7 @@
             <Label fx:id="welcomeLabel" text="Label" />
             <TextField fx:id="searchUserId" />
             <Button mnemonicParsing="false" onAction="#addFriendRequest" text="Add friend" />
-            <Button mnemonicParsing="false" text="Settings" onAction="#settingsStartUp"/>
+            <Button mnemonicParsing="false" onAction="#settingsStartUp" text="Settings" />
          </children>
       </HBox>
    </top>
@@ -36,11 +36,17 @@
       </VBox>
    </center>
    <right>
-      <VBox prefHeight="288.0" prefWidth="182.0" spacing="10" BorderPane.alignment="CENTER">
+      <VBox prefHeight="288.0" prefWidth="300.0" spacing="10" BorderPane.alignment="CENTER">
          <children>
-            <Label text="Friendships:" />
-            <ComboBox fx:id="friendshipsComboBox" accessibleText="Accepted" onAction="#updateFriendshipList" prefWidth="150.0" promptText="Status" />
-            <ListView fx:id="statusFriendshipsList" prefHeight="200.0" prefWidth="161.0" />
+            <Label text="Friend Requests:" />
+            <ComboBox fx:id="friendRequestsComboBox" accessibleText="Accepted" onAction="#updateFriendshipList" prefWidth="150.0" promptText="Status" />
+            <ListView onMouseClicked="#updateAcceptAndRejectButtons" fx:id="statusFriendRequests" prefHeight="200.0" prefWidth="300.0" />
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Button fx:id="acceptRequestButton" onAction="#acceptFriendRequest" mnemonicParsing="false" text="Accept" disable="true"/>
+                  <Button fx:id="rejectRequestButton" onAction="#rejectFriendRequest" mnemonicParsing="false" text="Reject" disable="true"/>
+               </children>
+            </HBox>
          </children>
       </VBox>
    </right>

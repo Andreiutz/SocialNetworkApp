@@ -17,7 +17,7 @@ import com.example.socialnetworkgui.repository.database.FriendRequestsDbReposito
 import com.example.socialnetworkgui.repository.database.FriendshipDbRepository;
 import com.example.socialnetworkgui.repository.database.UserDbRepository;
 import com.example.socialnetworkgui.utils.events.ChangeEventType;
-import com.example.socialnetworkgui.utils.events.FriendShipEntityChangedEvent;
+import com.example.socialnetworkgui.utils.events.EntityChangedEvent;
 import com.example.socialnetworkgui.utils.observer.Observable;
 import com.example.socialnetworkgui.utils.observer.Observer;
 
@@ -32,13 +32,13 @@ import java.util.stream.StreamSupport;
 /**
  * Service used for managing the SocialNetwork
  */
-public class Service implements Observable<FriendShipEntityChangedEvent> {
+public class Service implements Observable<EntityChangedEvent> {
 
     private Repository<String, User> usersRepo;
     private Repository<OrderedStringPair, Friendship> friendshipsRepo;
     private Repository<Integer, FriendRequest> friendRequestsRepo;
     private static User currentLoggedUser;
-    private final List<Observer<FriendShipEntityChangedEvent>> observers = new ArrayList<>();
+    private final List<Observer<EntityChangedEvent>> observers = new ArrayList<>();
     private static final Service singletonService = new Service(
             new UserDbRepository("jdbc:postgresql://localhost:5432/socialnetwork", "postgres", "postgres", new UserValidator()),
             new FriendshipDbRepository("jdbc:postgresql://localhost:5432/socialnetwork", "postgres", "postgres", new FriendshipValidator()),
@@ -175,7 +175,7 @@ public class Service implements Observable<FriendShipEntityChangedEvent> {
         if (!friendshipsRepo.save(newFriendship)) {
             throw new ServiceException("Failed to save friendship! It already exists!");
         }
-        notifyObservers(new FriendShipEntityChangedEvent(ChangeEventType.ADD, newFriendship));
+        notifyObservers(new EntityChangedEvent(ChangeEventType.ADD, newFriendship));
     }
 
     /**
@@ -190,7 +190,7 @@ public class Service implements Observable<FriendShipEntityChangedEvent> {
         }
         friendship.setFriendsFrom(LocalDateTime.now());
         friendshipsRepo.update(friendship);
-        notifyObservers(new FriendShipEntityChangedEvent(ChangeEventType.UPDATE, friendship));
+        notifyObservers(new EntityChangedEvent(ChangeEventType.UPDATE, friendship));
     }
 
     /**
@@ -204,7 +204,7 @@ public class Service implements Observable<FriendShipEntityChangedEvent> {
         if (deletedFriendship == null) {
             throw new ServiceException("Friendship does not exist!");
         }
-        notifyObservers(new FriendShipEntityChangedEvent(ChangeEventType.DELETE, deletedFriendship));
+        notifyObservers(new EntityChangedEvent(ChangeEventType.DELETE, deletedFriendship));
     }
 
     /**
@@ -320,30 +320,49 @@ public class Service implements Observable<FriendShipEntityChangedEvent> {
                 throw new ServiceException("There is already a pending friend request!");
             }
             if (lastReceived != null && lastReceived.getStatus().equals(Status.PENDING)) {
-                lastReceived.setStatus(Status.ACCEPTED);
-                friendRequestsRepo.update(lastReceived);
-                addFriendShip(currentLoggedUser.getId(), otherUserName);
+                //lastReceived.setStatus(Status.ACCEPTED);
+                //friendRequestsRepo.update(lastReceived);
+                //addFriendShip(currentLoggedUser.getId(), otherUserName);
+                throw new ServiceException("You have a pending friend request from this user!");
             } else {
-                friendRequestsRepo.save(
-                        new FriendRequest(currentLoggedUser.getId(),
-                                otherUserName)
-                );
+                FriendRequest newFriendRequest = new FriendRequest(currentLoggedUser.getId(), otherUserName);
+                friendRequestsRepo.save(newFriendRequest);
+                notifyObservers(new EntityChangedEvent(ChangeEventType.ADD, newFriendRequest));
+
             }
         }
     }
 
+    public void updateFriendRequest(FriendRequest oldFriendRequest, Status newStatus) {
+        oldFriendRequest.setStatus(newStatus);
+        if (newStatus.equals(Status.ACCEPTED)) {
+            addFriendShip(oldFriendRequest.getFromId(), oldFriendRequest.getToId());
+        }
+        friendRequestsRepo.update(oldFriendRequest);
+        notifyObservers(new EntityChangedEvent(ChangeEventType.UPDATE, oldFriendRequest));
+    }
+
+    public Iterable<FriendRequest> getFriendRequest(Status status) {
+        String currentUserName = currentLoggedUser.getId();
+        Iterable<FriendRequest> allFriendRequests = friendRequestsRepo.findAll();
+        return StreamSupport.stream(allFriendRequests.spliterator(), false)
+                .filter(x -> x.getStatus().equals(status)
+                        && (x.getFromId().equals(currentUserName) || x.getToId().equals(currentUserName)))
+                .collect(Collectors.toList());
+    }
+
     @Override
-    public void addObserver(Observer<FriendShipEntityChangedEvent> e) {
+    public void addObserver(Observer<EntityChangedEvent> e) {
         observers.add(e);
     }
 
     @Override
-    public void removeObserver(Observer<FriendShipEntityChangedEvent> e) {
+    public void removeObserver(Observer<EntityChangedEvent> e) {
         observers.remove(e);
     }
 
     @Override
-    public void notifyObservers(FriendShipEntityChangedEvent t) {
+    public void notifyObservers(EntityChangedEvent t) {
         observers.forEach(x -> x.update(t));
     }
 }

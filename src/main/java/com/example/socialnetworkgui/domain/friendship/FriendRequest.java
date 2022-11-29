@@ -45,4 +45,14 @@ public class FriendRequest extends Entity<Integer> {
     public void setStatus(Status status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "FriendRequest{" +
+                "fromId='" + fromId + '\'' +
+                ", toId='" + toId + '\'' +
+                ", status=" + status +
+                ", timeSent=" + timeSent +
+                '}';
+    }
 }

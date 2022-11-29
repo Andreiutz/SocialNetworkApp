@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<VBox spacing="30" minWidth="600" minHeight="400" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.socialnetworkgui.controller.SignUpController">
+
+<?import javafx.scene.control.PasswordField?>
+<VBox alignment="CENTER" minHeight="400" minWidth="600" prefHeight="400.0" prefWidth="600.0" spacing="30" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.socialnetworkgui.controller.SignUpController">
    <children>
        <Label alignment="CENTER" layoutX="262.0" layoutY="35.0" text="Sign Up!">
            <font>
@@ -14,42 +19,50 @@
        <HBox alignment="CENTER" spacing="40">
            <VBox alignment="CENTER">
                <Label text="Username:" />
-               <TextField />
+               <TextField fx:id="userNameTF" />
 
                <Label text="First name:" />
-               <TextField  />
+               <TextField fx:id="firstNameTF" />
 
                <Label text="Last name:" />
-               <TextField />
+               <TextField fx:id="lastNameTF" />
 
                <Label text="Email address:" />
-               <TextField  />
-
-               <Label text="Country:" />
-               <TextField />
+               <TextField fx:id="emailTF" />
+            <Label text="Birth Date" />
+            <DatePicker fx:id="birthDatePicker" />
            </VBox>
            <VBox alignment="CENTER">
+
+               <Label text="Country:" />
+               <TextField fx:id="countryTF" />
                <Label text="County:" />
-               <TextField />
+               <TextField fx:id="countyTF" />
 
                <Label text="City:" />
-               <TextField />
+               <TextField fx:id="cityTF" />
 
                <Label text="Street:" />
-               <TextField />
+               <TextField fx:id="streetTF" />
 
                <Label text="Street number:" />
-               <TextField />
-
-               <Label text="Password:" />
-               <TextField />
+               <TextField fx:id="streetNumberTF" />
            </VBox>
+         <VBox alignment="CENTER">
+            <children>
+   
+                  <Label text="Password:" />
+                  <PasswordField fx:id="passwordTF" />
+               <Label text="Confirm Password:" />
+               <PasswordField fx:id="confirmPasswordTF" />
+            </children>
+         </VBox>
        </HBox>
 
 
-      <Button mnemonicParsing="false" text="Sign up" />
+      <Button mnemonicParsing="false" onAction="#mainAppStartUp" text="Sign up" />
 
-       <Button mnemonicParsing="false" text="or Log in" onAction="#logInStartUp">
+       <Button mnemonicParsing="false" onAction="#logInStartUp" text="or Log in">
 
        </Button>
    </children>
