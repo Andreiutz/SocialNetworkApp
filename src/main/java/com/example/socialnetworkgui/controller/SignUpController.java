@@ -11,13 +11,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class SignUpController {
 
@@ -32,7 +33,7 @@ public class SignUpController {
     @FXML
     private TextField emailTF;
     @FXML
-    private DatePicker birthDatePicker;
+    private TextField birthDatePicker;
     @FXML
     private TextField countryTF;
     @FXML
@@ -73,7 +74,13 @@ public class SignUpController {
         String firstName = firstNameTF.getText();
         String lastName = lastNameTF.getText();
         String email = emailTF.getText();
-        LocalDate birthDate = birthDatePicker.getValue();
+        LocalDate birthDate;
+        try {
+            String stringDate = birthDatePicker.getText();
+            birthDate = LocalDate.parse(stringDate, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+        } catch (DateTimeParseException exception) {
+            birthDate = null;
+        }
         String country = countryTF.getText();
         String county = countyTF.getText();
         String city = cityTF.getText();

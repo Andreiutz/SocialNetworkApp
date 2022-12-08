@@ -20,7 +20,7 @@
                   <Image url="@media/istockphoto-1223671392-612x612.jpg" />
                </image>
             </ImageView>
-            <Label text="Label">
+            <Label fx:id="nameLabel" text="">
                <font>
                   <Font name="System Bold" size="31.0" />
                </font>

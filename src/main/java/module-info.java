@@ -9,7 +9,6 @@ module com.example.socialnetworkgui {
     opens com.example.socialnetworkgui.domain.user to javafx.fxml, javafx.base;
     opens com.example.socialnetworkgui.controller to javafx.fxml;
 
-
     exports com.example.socialnetworkgui;
     exports com.example.socialnetworkgui.service;
     exports com.example.socialnetworkgui.controller;

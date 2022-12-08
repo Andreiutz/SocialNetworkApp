@@ -1,6 +1,7 @@
 package com.example.socialnetworkgui.domain.friendship;
 
 import com.example.socialnetworkgui.domain.Entity;
+import com.example.socialnetworkgui.utils.constants.TimeFormatConstants;
 
 import java.time.LocalDateTime;
 
@@ -48,11 +49,6 @@ public class FriendRequest extends Entity<Integer> {
 
     @Override
     public String toString() {
-        return "FriendRequest{" +
-                "fromId='" + fromId + '\'' +
-                ", toId='" + toId + '\'' +
-                ", status=" + status +
-                ", timeSent=" + timeSent +
-                '}';
+        return String.format("To: %s | From: %s | %s", toId, fromId, timeSent.format(TimeFormatConstants.DATE_TIME_FORMAT));
     }
 }

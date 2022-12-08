@@ -1,0 +1,45 @@
+* {
+    -fx-primary-color: #007acc;
+    -fx-secondary-color: #4b6eaf;
+    -fx-grey-color: #b9b9b9;
+    -fx-focus-color: -fx-secondary-color;
+}
+
+.text-field {
+    -fx-min-height: 30;
+    -fx-background-color: -fx-grey-color, white;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-opacity: 0.7;
+    -fx-background-radius: 5 15 5 15;
+
+}
+.text-field :focused {
+    -fx-background-color: -fx-primary-color, white;
+}
+
+.vbox {
+   -fx-background-image: url('media/login_picture.jpg');
+    -fx-background-repeat: stretch;
+    -fx-background-size: 1000 700;
+    -fx-background-position: center center;
+    -fx-spacing: 5;
+}
+
+
+.t {
+
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.button {
+    -fx-background-radius: 15 5 15 5;
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    -fx-min-height: 30;
+    -fx-min-width: 80;
+}
+
+.date-picker {
+    -fx-background-radius: 15 5 15 5;
+}

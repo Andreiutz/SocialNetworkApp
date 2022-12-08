@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane styleClass="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" stylesheets="@list-object-style.css" fx:controller="com.example.socialnetworkgui.controller.FriendRequestObjectController">
+   <children>
+      <Label fx:id="fromLabel" prefWidth="200" layoutX="14.0" layoutY="6.0" text="Label" />
+      <Label fx:id="toLabel" prefWidth="200" layoutX="14.0" layoutY="27.0" text="Label" />
+      <Label fx:id="dateLabel" prefWidth="200" layoutX="178.0" layoutY="16.0" text="Label" />
+   </children>
+</AnchorPane>

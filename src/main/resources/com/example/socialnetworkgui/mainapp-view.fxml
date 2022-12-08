@@ -4,6 +4,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -40,11 +41,16 @@
          <children>
             <Label text="Friend Requests:" />
             <ComboBox fx:id="friendRequestsComboBox" accessibleText="Accepted" onAction="#updateFriendshipList" prefWidth="150.0" promptText="Status" />
-            <ListView onMouseClicked="#updateAcceptAndRejectButtons" fx:id="statusFriendRequests" prefHeight="200.0" prefWidth="300.0" />
+            <ScrollPane prefHeight="200.0" prefWidth="200.0">
+               <content>
+                  <VBox fx:id="friendRequestsVBox" prefHeight="200.0" prefWidth="100.0" spacing="10"/>
+               </content>
+            </ScrollPane>
+            <ListView fx:id="statusFriendRequests" onMouseClicked="#updateAcceptAndRejectButtons" prefHeight="200.0" prefWidth="300.0" />
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Button fx:id="acceptRequestButton" onAction="#acceptFriendRequest" mnemonicParsing="false" text="Accept" disable="true"/>
-                  <Button fx:id="rejectRequestButton" onAction="#rejectFriendRequest" mnemonicParsing="false" text="Reject" disable="true"/>
+                  <Button fx:id="acceptRequestButton" disable="true" mnemonicParsing="false" onAction="#acceptFriendRequest" text="Accept" />
+                  <Button fx:id="rejectRequestButton" disable="true" mnemonicParsing="false" onAction="#rejectFriendRequest" text="Reject" />
                </children>
             </HBox>
          </children>

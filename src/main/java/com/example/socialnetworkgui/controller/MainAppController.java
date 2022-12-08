@@ -19,6 +19,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -53,7 +54,8 @@ public class MainAppController implements Observer<EntityChangedEvent> {
     private Button acceptRequestButton;
     @FXML
     private Button rejectRequestButton;
-
+    @FXML
+    private VBox friendRequestsVBox;
 
     @FXML
     public void initialize() {
@@ -118,10 +120,28 @@ public class MainAppController implements Observer<EntityChangedEvent> {
     }
 
     @FXML
-    public void updateFriendshipList(ActionEvent actionEvent) {
+    public void updateFriendshipList(ActionEvent actionEvent) throws IOException {
         Status status = friendRequestsComboBox.getSelectionModel().getSelectedItem();
         List<FriendRequest> friendRequests = StreamSupport.stream(service.getFriendRequest(status).spliterator(), false).toList();
         statusFriendRequests.getItems().setAll(friendRequests);
+        friendRequestsVBox.getChildren().removeAll();
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        for (FriendRequest friendRequest : friendRequests) {
+            try {
+                fxmlLoader.setControllerFactory(x -> new FriendRequestObjectController(friendRequest.getToId(),
+                        friendRequest.getFromId(), friendRequest.getTimeSent()));
+                Node node = fxmlLoader.load(HelloApplication.class.getResource("list-object.fxml"));
+                node.setOnMouseEntered(event -> {
+                    node.setStyle("-fx-background-color: lightgrey");
+                });
+                node.setOnMouseExited(event -> {
+                    node.setStyle("-fx-background-color: white");
+                });
+                friendRequestsVBox.getChildren().add(node);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML
@@ -185,4 +205,5 @@ public class MainAppController implements Observer<EntityChangedEvent> {
         initFriendRequests();
         friendRequestsComboBox.getSelectionModel().clearSelection();
     }
+
 }
