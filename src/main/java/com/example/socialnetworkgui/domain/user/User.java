@@ -118,14 +118,10 @@ public class User extends Entity<String> {
 
     @Override
     public String toString() {
-        return "User{\n" +
+        return "{\n" +
                 "\tuserName  ='" + super.getId() + "'\n" +
                 "\tfirstName ='" + firstName + "'\n" +
                 "\tlastName  ='" + lastName + "'\n" +
-                "\temail     ='" + email + "'\n" +
-                "\tbirthDate ='" + birthDate + "'\n"+
-                "\taddress   ='" + address.toString() + "'\n" +
-                "\tpassword  ='" + password + "'\n" +
                 '}';
     }
 }

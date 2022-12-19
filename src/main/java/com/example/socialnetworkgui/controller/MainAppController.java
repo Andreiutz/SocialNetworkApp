@@ -18,8 +18,6 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -43,23 +41,12 @@ public class MainAppController implements Observer<EntityChangedEvent> {
     @FXML
     private TableColumn<User, String> emailColumn;
     @FXML
-    private Label welcomeLabel;
-    @FXML
     private ComboBox<Status> friendRequestsComboBox;
     @FXML
-    private TextField searchUserId;
-    @FXML
     private ListView<FriendRequest> statusFriendRequests;
-    @FXML
-    private Button acceptRequestButton;
-    @FXML
-    private Button rejectRequestButton;
-    @FXML
-    private VBox friendRequestsVBox;
 
     @FXML
     public void initialize() {
-        welcomeLabel.setText(String.format("Welcome back, %s!", Service.getCurrentLoggedUser().getFirstName()));
         initFriends();
         initFriendRequests();
         service.addObserver(this);
@@ -84,19 +71,17 @@ public class MainAppController implements Observer<EntityChangedEvent> {
         usersModel.setAll(users1);
     }
 
+
     @FXML
-    public void addFriendRequest(ActionEvent actionEvent) {
-        String userName = searchUserId.getText();
-        Alert alert;
-        try {
-            service.addFriendRequest(userName);
-            alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setContentText("Friend request successfully sent!");
-        } catch (ServiceException | ValidationException e) {
-             alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText(e.getMessage());
-        }
-        alert.show();
+    public void launchAddFriendWindow(ActionEvent actionEvent) throws IOException {
+        Stage stage = new Stage();
+        stage.setMaxHeight(700);
+        stage.setMaxWidth(1000);
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("addfriend-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 700, 500);
+        stage.setTitle("Search users");
+        stage.setScene(scene);
+        stage.show();
     }
 
     @FXML
@@ -124,23 +109,24 @@ public class MainAppController implements Observer<EntityChangedEvent> {
         Status status = friendRequestsComboBox.getSelectionModel().getSelectedItem();
         List<FriendRequest> friendRequests = StreamSupport.stream(service.getFriendRequest(status).spliterator(), false).toList();
         statusFriendRequests.getItems().setAll(friendRequests);
-        friendRequestsVBox.getChildren().removeAll();
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        for (FriendRequest friendRequest : friendRequests) {
-            try {
-                fxmlLoader.setControllerFactory(x -> new FriendRequestObjectController(friendRequest.getToId(),
-                        friendRequest.getFromId(), friendRequest.getTimeSent()));
-                Node node = fxmlLoader.load(HelloApplication.class.getResource("list-object.fxml"));
-                node.setOnMouseEntered(event -> {
-                    node.setStyle("-fx-background-color: lightgrey");
-                });
-                node.setOnMouseExited(event -> {
-                    node.setStyle("-fx-background-color: white");
-                });
-                friendRequestsVBox.getChildren().add(node);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        ContextMenu contextMenu = new ContextMenu();
+        if (status.equals(Status.PENDING)) {
+            MenuItem acceptItem = new MenuItem();
+            acceptItem.textProperty().set("Accept");
+            acceptItem.setOnAction(this::acceptFriendRequest);
+
+            MenuItem rejectItem = new MenuItem();
+            rejectItem.textProperty().set("Reject");
+            rejectItem.setOnAction(this::rejectFriendRequest);
+
+            MenuItem cancelItem = new MenuItem();
+            cancelItem.textProperty().set("Cancel");
+            cancelItem.setOnAction(this::cancelFriendRequest);
+
+            contextMenu.getItems().addAll(acceptItem, rejectItem, cancelItem);
+            statusFriendRequests.setContextMenu(contextMenu);
+        } else {
+            statusFriendRequests.setContextMenu(new ContextMenu());
         }
     }
 
@@ -155,30 +141,33 @@ public class MainAppController implements Observer<EntityChangedEvent> {
     }
 
     @FXML
-    public void updateAcceptAndRejectButtons(MouseEvent mouseEvent) {
-        if (!statusFriendRequests.getSelectionModel().isEmpty()) {
-            FriendRequest currentSelectedFriendRequest = statusFriendRequests.getSelectionModel().getSelectedItem();
-            if (currentSelectedFriendRequest.getStatus().equals(Status.PENDING) &&
-                    !currentSelectedFriendRequest.getFromId().equals(Service.getCurrentLoggedUser().getId())) {
-                acceptRequestButton.setDisable(false);
-                rejectRequestButton.setDisable(false);
-            } else {
-                acceptRequestButton.setDisable(true);
-                rejectRequestButton.setDisable(true);
-            }
-        }
-    }
-
-    @FXML
     public void acceptFriendRequest(ActionEvent actionEvent) {
         FriendRequest friendRequest = statusFriendRequests.getSelectionModel().getSelectedItem();
-        updateFriendRequest(friendRequest, Status.ACCEPTED);
+        if (friendRequest.getFromId().equals(Service.getCurrentLoggedUser().getId())) {
+            new Alert(Alert.AlertType.ERROR, "You do not have permission to accept!").show();
+        } else {
+            updateFriendRequest(friendRequest, Status.ACCEPTED);
+        }
     }
 
     @FXML
     public void rejectFriendRequest(ActionEvent actionEvent) {
         FriendRequest friendRequest = statusFriendRequests.getSelectionModel().getSelectedItem();
-        updateFriendRequest(friendRequest, Status.REJECTED);
+        if (friendRequest.getFromId().equals(Service.getCurrentLoggedUser().getId())) {
+            new Alert(Alert.AlertType.ERROR, "You do not have permission to reject! ").show();
+        } else {
+            updateFriendRequest(friendRequest, Status.REJECTED);
+        }
+    }
+
+    @FXML
+    public void cancelFriendRequest(ActionEvent actionEvent) {
+        FriendRequest friendRequest = statusFriendRequests.getSelectionModel().getSelectedItem();
+        if (friendRequest.getToId().equals(Service.getCurrentLoggedUser().getId())) {
+            new Alert(Alert.AlertType.ERROR, "You do not have permission to cancel! ").show();
+        } else {
+            deleteFriendRequest(friendRequest);
+        }
     }
 
     private void updateFriendRequest(FriendRequest friendRequest, Status status) {
@@ -198,12 +187,22 @@ public class MainAppController implements Observer<EntityChangedEvent> {
         alert.show();
     }
 
+    private void deleteFriendRequest(FriendRequest friendRequest) {
+        try {
+            service.deleteFriendRequest(friendRequest.getId());
+        } catch (ServiceException exception) {
+            new Alert(Alert.AlertType.ERROR, exception.getMessage()).show();
+        }
+    }
 
     @Override
     public void update(EntityChangedEvent entityChangedEvent) {
         initFriends();
         initFriendRequests();
-        friendRequestsComboBox.getSelectionModel().clearSelection();
-    }
+        try {
+            updateFriendshipList(new ActionEvent());
+        } catch (IOException ignored){
 
+        }
+    }
 }

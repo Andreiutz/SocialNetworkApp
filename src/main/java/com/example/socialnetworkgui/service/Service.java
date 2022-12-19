@@ -21,6 +21,7 @@ import com.example.socialnetworkgui.utils.events.EntityChangedEvent;
 import com.example.socialnetworkgui.utils.observer.Observable;
 import com.example.socialnetworkgui.utils.observer.Observer;
 
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -74,10 +75,16 @@ public class Service implements Observable<EntityChangedEvent> {
      * @throws ServiceException, if the user was not added
      */
     public void addUser(String userName, String firstName, String lastName, String email, LocalDate date, Address address, String password) {
-        User newUser = new User(userName, firstName, lastName, email, date, address, password);
-        if (!usersRepo.save(newUser)) {
-            throw new ServiceException("User could not be saved!");
+        try {
+            String encryptedPassword = StringHash.toHexString(StringHash.getSHA(password));
+            User newUser = new User(userName, firstName, lastName, email, date, address, encryptedPassword);
+            if (!usersRepo.save(newUser)) {
+                throw new ServiceException("User could not be saved!");
+            }
+        } catch (NoSuchAlgorithmException ignored) {
+            throw new ServiceException("Something went wrong!");
         }
+
     }
 
     /**
@@ -320,9 +327,6 @@ public class Service implements Observable<EntityChangedEvent> {
                 throw new ServiceException("There is already a pending friend request!");
             }
             if (lastReceived != null && lastReceived.getStatus().equals(Status.PENDING)) {
-                //lastReceived.setStatus(Status.ACCEPTED);
-                //friendRequestsRepo.update(lastReceived);
-                //addFriendShip(currentLoggedUser.getId(), otherUserName);
                 throw new ServiceException("You have a pending friend request from this user!");
             } else {
                 FriendRequest newFriendRequest = new FriendRequest(currentLoggedUser.getId(), otherUserName);
@@ -349,6 +353,14 @@ public class Service implements Observable<EntityChangedEvent> {
                 .filter(x -> x.getStatus().equals(status)
                         && (x.getFromId().equals(currentUserName) || x.getToId().equals(currentUserName)))
                 .collect(Collectors.toList());
+    }
+
+    public void deleteFriendRequest(Integer id) {
+        FriendRequest friendRequest = friendRequestsRepo.delete(id);
+        if (friendRequest == null) {
+            throw new ServiceException("The friend request does not exist!");
+        }
+        notifyObservers(new EntityChangedEvent(ChangeEventType.DELETE, friendRequest));
     }
 
     @Override

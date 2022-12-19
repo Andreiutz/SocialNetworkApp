@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * User-ul trimite un friend request, in db apare ca pending
@@ -29,7 +30,7 @@ public class HelloApplication extends Application {
         stage.show();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         launch();
     }
 }

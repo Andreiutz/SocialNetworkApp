@@ -3,6 +3,7 @@ package com.example.socialnetworkgui.controller;
 import com.example.socialnetworkgui.HelloApplication;
 import com.example.socialnetworkgui.domain.user.User;
 import com.example.socialnetworkgui.service.Service;
+import com.example.socialnetworkgui.service.StringHash;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 
 public class LoginController {
@@ -26,11 +28,13 @@ public class LoginController {
     private PasswordField passwordLogInField;
 
     @FXML
-    private void logIn(ActionEvent actionEvent) throws IOException {
+    private void logIn(ActionEvent actionEvent) throws IOException, NoSuchAlgorithmException {
         String userName = userNameLogInField.getText();
         String password = passwordLogInField.getText();
+        String encryptedPassword = StringHash.toHexString(StringHash.getSHA(password));
         User user = service.findUser(userName);
-        if (user != null && user.getPassword().equals(password)) {
+        System.out.println(user.toString());
+        if (user != null && user.getPassword().equals(encryptedPassword)) {
             mainAppStartUp(actionEvent, user);
         } else {
             Alert alert = new Alert(Alert.AlertType.ERROR);

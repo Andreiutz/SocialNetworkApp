@@ -49,6 +49,6 @@ public class FriendRequest extends Entity<Integer> {
 
     @Override
     public String toString() {
-        return String.format("To: %s | From: %s | %s", toId, fromId, timeSent.format(TimeFormatConstants.DATE_TIME_FORMAT));
+        return String.format("To: %s \nFrom: %s\n %s", toId, fromId, timeSent.format(TimeFormatConstants.DATE_TIME_FORMAT));
     }
 }

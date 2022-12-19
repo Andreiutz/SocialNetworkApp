@@ -16,9 +16,7 @@
    <top>
       <HBox prefHeight="62.0" prefWidth="600.0" spacing="20" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="welcomeLabel" text="Label" />
-            <TextField fx:id="searchUserId" />
-            <Button mnemonicParsing="false" onAction="#addFriendRequest" text="Add friend" />
+            <Button mnemonicParsing="false" onAction="#launchAddFriendWindow" text="Add friend" />
             <Button mnemonicParsing="false" onAction="#settingsStartUp" text="Settings" />
          </children>
       </HBox>
@@ -37,22 +35,11 @@
       </VBox>
    </center>
    <right>
-      <VBox prefHeight="288.0" prefWidth="300.0" spacing="10" BorderPane.alignment="CENTER">
+      <VBox prefHeight="288.0" prefWidth="200.0" spacing="10" BorderPane.alignment="CENTER">
          <children>
             <Label text="Friend Requests:" />
             <ComboBox fx:id="friendRequestsComboBox" accessibleText="Accepted" onAction="#updateFriendshipList" prefWidth="150.0" promptText="Status" />
-            <ScrollPane prefHeight="200.0" prefWidth="200.0">
-               <content>
-                  <VBox fx:id="friendRequestsVBox" prefHeight="200.0" prefWidth="100.0" spacing="10"/>
-               </content>
-            </ScrollPane>
-            <ListView fx:id="statusFriendRequests" onMouseClicked="#updateAcceptAndRejectButtons" prefHeight="200.0" prefWidth="300.0" />
-            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-               <children>
-                  <Button fx:id="acceptRequestButton" disable="true" mnemonicParsing="false" onAction="#acceptFriendRequest" text="Accept" />
-                  <Button fx:id="rejectRequestButton" disable="true" mnemonicParsing="false" onAction="#rejectFriendRequest" text="Reject" />
-               </children>
-            </HBox>
+            <ListView fx:id="statusFriendRequests" prefHeight="200.0" prefWidth="200.0" />
          </children>
       </VBox>
    </right>

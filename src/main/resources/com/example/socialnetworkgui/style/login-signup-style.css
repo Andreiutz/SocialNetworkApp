@@ -18,7 +18,7 @@
 }
 
 .vbox {
-   -fx-background-image: url('media/login_picture.jpg');
+    -fx-background-image: url('../media/background.jpg');
     -fx-background-repeat: stretch;
     -fx-background-size: 1000 700;
     -fx-background-position: center center;
@@ -27,7 +27,6 @@
 
 
 .t {
-
     -fx-text-fill: white;
     -fx-font-weight: bold;
 }

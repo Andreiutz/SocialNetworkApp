@@ -1,0 +1,39 @@
+.vbox {
+    -fx-alignment: center;
+    -fx-background-image: url('../media/background.jpg');
+    -fx-background-repeat: stretch;
+    -fx-background-size: 1000 700;
+    -fx-background-position: center center;
+    -fx-spacing: 5;
+}
+.text-field {
+    -fx-min-width: 200;
+    -fx-max-width: 300;
+    -fx-padding: 50;
+    -fx-border-insets: 50;
+    -fx-background-insets: 45;
+    -fx-background-radius: 5 15 5 15;
+    -fx-opacity: 0.7;
+}
+
+.label {
+    -fx-text-fill: white;
+    -fx-font-family: Arial;
+    -fx-font-size: 30;
+}
+
+.list-view {
+    -fx-min-width: 400;
+    -fx-max-width: 550;
+    -fx-min-height: 250;
+    -fx-padding: 20;
+    -fx-background-radius: 30;
+}
+
+.button {
+    -fx-background-radius: 15 5 15 5;
+    -fx-background-color: white;
+    -fx-text-fill: black;
+    -fx-min-height: 30;
+    -fx-min-width: 80;
+}
