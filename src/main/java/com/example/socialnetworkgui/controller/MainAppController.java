@@ -85,6 +85,18 @@ public class MainAppController implements Observer<EntityChangedEvent> {
     }
 
     @FXML
+    public void launchConversationsWindow(ActionEvent actionEvent) throws IOException{
+        Stage stage = new Stage();
+        stage.setMaxHeight(700);
+        stage.setMaxWidth(1000);
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("conversations-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 700, 500);
+        stage.setTitle("Search users");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @FXML
     public void deleteFriend(ActionEvent actionEvent) {
         Alert alert;
         if (usersTableView.getSelectionModel().isEmpty()) {
@@ -106,27 +118,29 @@ public class MainAppController implements Observer<EntityChangedEvent> {
 
     @FXML
     public void updateFriendshipList(ActionEvent actionEvent) throws IOException {
-        Status status = friendRequestsComboBox.getSelectionModel().getSelectedItem();
-        List<FriendRequest> friendRequests = StreamSupport.stream(service.getFriendRequest(status).spliterator(), false).toList();
-        statusFriendRequests.getItems().setAll(friendRequests);
-        ContextMenu contextMenu = new ContextMenu();
-        if (status.equals(Status.PENDING)) {
-            MenuItem acceptItem = new MenuItem();
-            acceptItem.textProperty().set("Accept");
-            acceptItem.setOnAction(this::acceptFriendRequest);
+        if (!friendRequestsComboBox.getSelectionModel().isEmpty()) {
+            Status status = friendRequestsComboBox.getSelectionModel().getSelectedItem();
+            List<FriendRequest> friendRequests = StreamSupport.stream(service.getFriendRequest(status).spliterator(), false).toList();
+            statusFriendRequests.getItems().setAll(friendRequests);
+            ContextMenu contextMenu = new ContextMenu();
+            if (status.equals(Status.PENDING)) {
+                MenuItem acceptItem = new MenuItem();
+                acceptItem.textProperty().set("Accept");
+                acceptItem.setOnAction(this::acceptFriendRequest);
 
-            MenuItem rejectItem = new MenuItem();
-            rejectItem.textProperty().set("Reject");
-            rejectItem.setOnAction(this::rejectFriendRequest);
+                MenuItem rejectItem = new MenuItem();
+                rejectItem.textProperty().set("Reject");
+                rejectItem.setOnAction(this::rejectFriendRequest);
 
-            MenuItem cancelItem = new MenuItem();
-            cancelItem.textProperty().set("Cancel");
-            cancelItem.setOnAction(this::cancelFriendRequest);
+                MenuItem cancelItem = new MenuItem();
+                cancelItem.textProperty().set("Cancel");
+                cancelItem.setOnAction(this::cancelFriendRequest);
 
-            contextMenu.getItems().addAll(acceptItem, rejectItem, cancelItem);
-            statusFriendRequests.setContextMenu(contextMenu);
-        } else {
-            statusFriendRequests.setContextMenu(new ContextMenu());
+                contextMenu.getItems().addAll(acceptItem, rejectItem, cancelItem);
+                statusFriendRequests.setContextMenu(contextMenu);
+            } else {
+                statusFriendRequests.setContextMenu(new ContextMenu());
+            }
         }
     }
 

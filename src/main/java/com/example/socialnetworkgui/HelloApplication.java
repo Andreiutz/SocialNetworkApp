@@ -14,8 +14,9 @@ import java.security.NoSuchAlgorithmException;
  */
 
 /**
- * TODO: Implement friend request validator
- *
+ * TODO: Implement validators for conversation and message
+ * TODO: Implement service logic for these
+ * TODO: GUI for conversations.
  */
 
 public class HelloApplication extends Application {

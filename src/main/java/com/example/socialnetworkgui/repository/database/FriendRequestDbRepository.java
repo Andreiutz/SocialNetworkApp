@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-public class FriendRequestsDbRepository extends AbstractDbRepository<Integer, FriendRequest> {
+public class FriendRequestDbRepository extends AbstractDbRepository<Integer, FriendRequest> {
 
     /**
      * Constructor
@@ -19,7 +19,7 @@ public class FriendRequestsDbRepository extends AbstractDbRepository<Integer, Fr
      * @param password  password for database login
      * @param validator entity validato
      */
-    public FriendRequestsDbRepository(String url, String userName, String password, Validator<FriendRequest> validator) {
+    public FriendRequestDbRepository(String url, String userName, String password, Validator<FriendRequest> validator) {
         super(url, userName, password, validator);
     }
 

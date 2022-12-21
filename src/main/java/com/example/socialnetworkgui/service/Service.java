@@ -3,19 +3,16 @@ package com.example.socialnetworkgui.service;
 
 import com.example.socialnetworkgui.domain.CommunityNode;
 import com.example.socialnetworkgui.domain.OrderedStringPair;
+import com.example.socialnetworkgui.domain.conversation.Conversation;
+import com.example.socialnetworkgui.domain.conversation.Message;
 import com.example.socialnetworkgui.domain.friendship.FriendRequest;
 import com.example.socialnetworkgui.domain.friendship.Friendship;
 import com.example.socialnetworkgui.domain.friendship.Status;
 import com.example.socialnetworkgui.domain.user.Address;
 import com.example.socialnetworkgui.domain.user.User;
 import com.example.socialnetworkgui.domain.user.UserParameter;
-import com.example.socialnetworkgui.domain.validators.FriendRequestValidator;
-import com.example.socialnetworkgui.domain.validators.FriendshipValidator;
-import com.example.socialnetworkgui.domain.validators.UserValidator;
-import com.example.socialnetworkgui.repository.Repository;
-import com.example.socialnetworkgui.repository.database.FriendRequestsDbRepository;
-import com.example.socialnetworkgui.repository.database.FriendshipDbRepository;
-import com.example.socialnetworkgui.repository.database.UserDbRepository;
+import com.example.socialnetworkgui.domain.validators.*;
+import com.example.socialnetworkgui.repository.database.*;
 import com.example.socialnetworkgui.utils.events.ChangeEventType;
 import com.example.socialnetworkgui.utils.events.EntityChangedEvent;
 import com.example.socialnetworkgui.utils.observer.Observable;
@@ -35,23 +32,37 @@ import java.util.stream.StreamSupport;
  */
 public class Service implements Observable<EntityChangedEvent> {
 
-    private Repository<String, User> usersRepo;
-    private Repository<OrderedStringPair, Friendship> friendshipsRepo;
-    private Repository<Integer, FriendRequest> friendRequestsRepo;
+    private DBRepository<String, User> usersRepo;
+    private DBRepository<OrderedStringPair, Friendship> friendshipsRepo;
+    private DBRepository<Integer, FriendRequest> friendRequestsRepo;
+    private DBRepository<Integer, Message> messagesRepo;
+    private DBRepository<Integer, Conversation> conversationsRepository;
+
     private static User currentLoggedUser;
+
     private final List<Observer<EntityChangedEvent>> observers = new ArrayList<>();
+
     private static final Service singletonService = new Service(
             new UserDbRepository("jdbc:postgresql://localhost:5432/socialnetwork", "postgres", "postgres", new UserValidator()),
             new FriendshipDbRepository("jdbc:postgresql://localhost:5432/socialnetwork", "postgres", "postgres", new FriendshipValidator()),
-            new FriendRequestsDbRepository("jdbc:postgresql://localhost:5432/socialnetwork", "postgres", "postgres", new FriendRequestValidator())
+            new FriendRequestDbRepository("jdbc:postgresql://localhost:5432/socialnetwork", "postgres", "postgres", new FriendRequestValidator()),
+            new MessageDbRepository("jdbc:postgresql://localhost:5432/socialnetwork", "postgres", "postgres", new MessageValidator()),
+            new ConversationDbRepository("jdbc:postgresql://localhost:5432/socialnetwork", "postgres", "postgres", new ConversationValidator())
     );
 
     private Service() {}
 
-    private Service(Repository<String, User> usersRepo, Repository<OrderedStringPair, Friendship> friendshipsRepo, Repository<Integer, FriendRequest> friendRequestsRepo) {
+    private Service(DBRepository<String, User> usersRepo,
+                    DBRepository<OrderedStringPair, Friendship> friendshipsRepo,
+                    DBRepository<Integer, FriendRequest> friendRequestsRepo,
+                    DBRepository<Integer, Message> messagesRepo,
+                    DBRepository<Integer, Conversation> conversationsRepository
+                    ) {
         this.usersRepo = usersRepo;
         this.friendshipsRepo = friendshipsRepo;
         this.friendRequestsRepo = friendRequestsRepo;
+        this.messagesRepo = messagesRepo;
+        this.conversationsRepository = conversationsRepository;
     }
 
     public static Service getInstance() {
@@ -361,6 +372,27 @@ public class Service implements Observable<EntityChangedEvent> {
             throw new ServiceException("The friend request does not exist!");
         }
         notifyObservers(new EntityChangedEvent(ChangeEventType.DELETE, friendRequest));
+    }
+
+    /**
+     * Returns the list of all conversations stored in the database which have the current logged user in them
+     * @return list of conversations
+     */
+    public Iterable<Conversation> getConversationsForCurrentUser() {
+        Iterable<Conversation> allConversations = conversationsRepository.findAll();
+        String currentUserName = currentLoggedUser.getId();
+        return StreamSupport.stream(allConversations.spliterator(), false)
+                .filter(x -> x.getFirstUser().equals(currentUserName) || x.getSecondUser().equals(currentUserName))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Collects all the messages from the conversation with the given ID
+     * @param conversationID id of the conversation we want to get all the messages from
+     * @return the list of messages
+     */
+    public Iterable<Message> getMessagesFromConversation(int conversationID) {
+        return messagesRepo.getCustomList(String.format("select * from messages where id_conversation = %d", conversationID));
     }
 
     @Override

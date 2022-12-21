@@ -4,10 +4,8 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -18,6 +16,7 @@
          <children>
             <Button mnemonicParsing="false" onAction="#launchAddFriendWindow" text="Add friend" />
             <Button mnemonicParsing="false" onAction="#settingsStartUp" text="Settings" />
+            <Button mnemonicParsing="false" onAction="#launchConversationsWindow" text="Messages" />
          </children>
       </HBox>
    </top>

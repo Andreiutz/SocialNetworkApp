@@ -3,7 +3,6 @@ package com.example.socialnetworkgui.repository.database;
 
 import com.example.socialnetworkgui.domain.Entity;
 import com.example.socialnetworkgui.domain.validators.Validator;
-import com.example.socialnetworkgui.repository.Repository;
 
 import java.sql.*;
 import java.util.HashSet;
@@ -15,7 +14,7 @@ import java.util.Set;
  * @param <ID> identifier of an entity
  * @param <E> entity
  */
-public abstract class AbstractDbRepository<ID, E extends Entity<ID>> implements Repository<ID,E> {
+public abstract class AbstractDbRepository<ID, E extends Entity<ID>> implements DBRepository<ID,E> {
 
     protected String url;
     protected String userName;
@@ -186,5 +185,28 @@ public abstract class AbstractDbRepository<ID, E extends Entity<ID>> implements 
         } catch (SQLException exception) {
             return false;
         }
+    }
+
+    /**
+     * Returns a query based on a custom sql query
+     * @param sqlStatement
+     * @return
+     */
+    @Override
+    public Iterable<E> getCustomList(String sqlStatement) {
+        Set<E> entities = new HashSet<>();
+        try (Connection connection = DriverManager.getConnection(url, userName, password);
+             PreparedStatement statement = connection.prepareStatement(
+                     sqlStatement);
+             ResultSet resultSet = statement.executeQuery()
+        ) {
+            while (resultSet.next()) {
+                E entity = extractEntity(resultSet);
+                entities.add(entity);
+            }
+        } catch (SQLException exception) {
+            exception.printStackTrace();
+        }
+        return entities;
     }
 }
